@@ -16,6 +16,8 @@
  */
 #define CMSIS_device_header "gd32f4xx.h"
 
+/* GigaDevice::Device:StdPeripherals:FMC:1.0.3 */
+#define RTE_DEVICE_STDPERIPHERALS_FMC
 /* GigaDevice::Device:StdPeripherals:GPIO:1.0.3 */
 #define RTE_DEVICE_STDPERIPHERALS_GPIO
 /* GigaDevice::Device:StdPeripherals:MISC:1.0.3 */
