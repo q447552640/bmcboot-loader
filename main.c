@@ -2,11 +2,12 @@
  * @Author: Ma Yuchen
  * @Date: 2022-11-22 21:03:02
  * @LastEditors: Ma YuChen
- * @LastEditTime: 2022-11-23 12:47:25
+ * @LastEditTime: 2022-11-24 10:32:49
  * @Description: file content
  * @FilePath: \BootLoader\main.c
  */
 #include <gd32f4xx.h>
+#include "menu.h"
 #include "bsp_uart.h"
 #include "bsp_ocflash.h"
 #include "systick.h"
@@ -64,16 +65,7 @@ void RunApp(void)
 {
     if(ExistApplication() != 0)
     {
-        nvic_irq_disable(EXTI0_IRQn);
-
-        JumpAddress=*(__IO uint32_t *)(APPLICATION_ADDRESS+4);  //application main address
-
-        Jump_To_Application=(pFunction)JumpAddress;
-
-        //初始化Application的栈指针
-        __set_MSP(*(__IO uint32_t *)APPLICATION_ADDRESS);
-
-        Jump_To_Application();
+        LoadRunApplication();
     }
     else
     {
