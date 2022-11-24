@@ -2,7 +2,7 @@
  * @Author: Ma Yuchen
  * @Date: 2022-11-24 10:03:28
  * @LastEditors: Ma YuChen
- * @LastEditTime: 2022-11-24 11:25:49
+ * @LastEditTime: 2022-11-24 12:34:54
  * @Description: file content
  * @FilePath: \BootLoader\menu.c
  */
@@ -10,11 +10,11 @@
 #include "gd32f4xx.h"
 #include "menu.h"
 
-pFunction Jump_To_Application;
-uint32_t JumpAddress;
+static pFunction Jump_To_Application;
+static uint32_t JumpAddress;
 
-uint8_t tab_1024[PACKET_DATA_LENGTH] = {0};
-uint8_t FileName[FILE_NAME_LENGTH] = {0};
+static uint8_t tab_1024[PACKET_DATA_LENGTH] = {0};
+static uint8_t FileName[FILE_NAME_LENGTH] = {0};
 
 void SerialDownLoad(void);
 
@@ -49,6 +49,7 @@ void PrintMenu(void)
         else if (key == 0x32)
         {
             LoadRunApplication();
+						return ;
         }
         else
         {
@@ -63,7 +64,7 @@ void SerialDownLoad(void)
     int32_t Size=0;
 
     SerialPutString("\r\n Waiting for file to be sent ...\r\n");
-    Size=Ymodem_Receive(&tab_1024);
+    Size=Ymodem_Receive(tab_1024);
 
     if(Size>0)
     {
@@ -73,9 +74,12 @@ void SerialDownLoad(void)
         SerialPutString("\r\n Size: ");
         SerialPutString(Number);
         SerialPutString("Bytes\r\n");
-        stringPutString("--------------------------\r\n");
+        SerialPutString("--------------------------\r\n");
     }
-    
+    else
+    {
+        SerialPutString("\r\n Warning Receive File failed!!\r\n");
+    }
 }
 
 void LoadRunApplication(void)

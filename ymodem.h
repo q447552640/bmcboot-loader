@@ -9,7 +9,7 @@
  */
 #ifndef Y_MODEM_H
 #define Y_MODEM_H
-
+#include <stdint.h>
 #include <string.h>
 
 /*Ymodem Frame base on ASCII Encode*/
