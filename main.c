@@ -2,7 +2,7 @@
  * @Author: Ma Yuchen
  * @Date: 2022-11-22 21:03:02
  * @LastEditors: Ma YuChen
- * @LastEditTime: 2022-11-24 10:32:49
+ * @LastEditTime: 2022-11-24 11:27:04
  * @Description: file content
  * @FilePath: \BootLoader\main.c
  */
@@ -30,7 +30,7 @@ int main(void)
     if(GetIAPIntper() == 1)
     //如果获取到IAP请求中断则打印菜单进行IAP操作
     {
-
+        PrintMenu();
     }
     //如果无请求则跳转到APP启动
     else
