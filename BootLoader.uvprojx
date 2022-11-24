@@ -277,7 +277,7 @@
               <OCR_RVCT4>
                 <Type>1</Type>
                 <StartAddress>0x8000000</StartAddress>
-                <Size>0x300000</Size>
+                <Size>0x8000</Size>
               </OCR_RVCT4>
               <OCR_RVCT5>
                 <Type>1</Type>
@@ -418,6 +418,11 @@
               <FileName>ymodem.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\ymodem.h</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_gpio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\bsp_gpio.c</FilePath>
             </File>
           </Files>
         </Group>

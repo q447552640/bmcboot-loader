@@ -2,12 +2,13 @@
  * @Author: Ma Yuchen
  * @Date: 2022-11-22 21:03:02
  * @LastEditors: Ma YuChen
- * @LastEditTime: 2022-11-24 11:27:04
+ * @LastEditTime: 2022-11-24 23:18:25
  * @Description: file content
  * @FilePath: \BootLoader\main.c
  */
 #include <gd32f4xx.h>
 #include "menu.h"
+#include "bsp_gpio.h"
 #include "bsp_uart.h"
 #include "bsp_ocflash.h"
 #include "systick.h"
@@ -21,11 +22,17 @@ static int ExistApplication(void);
 
 int main(void)
 {
-    
     //初始化Core时钟
     systick_config();
+    //初始化GPIO并打开V3.3外设供电
+    InitGpio();
+    PowerOnBmcPeriph();
+    delay_1ms(10);
+    
     //初始化串口
     InitSerial();
+	
+		SerialPutString("\r\nThanks for use this bootLoader\r\n");
 
     if(GetIAPIntper() == 1)
     //如果获取到IAP请求中断则打印菜单进行IAP操作
@@ -75,7 +82,7 @@ void RunApp(void)
 
 int ExistApplication(void)
 {
-    if((*(__IO uint32_t *)APPLICATION_ADDRESS) & 0x2FFE0000 == 0x20000000)
+    if(((*(__IO uint32_t *)APPLICATION_ADDRESS) & 0x2FFE0000) == 0x20000000)
     {
         return 1;
     }

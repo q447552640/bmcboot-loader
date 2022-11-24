@@ -2,19 +2,20 @@
  * @Author: Ma Yuchen
  * @Date: 2022-11-24 10:03:28
  * @LastEditors: Ma YuChen
- * @LastEditTime: 2022-11-24 12:34:54
+ * @LastEditTime: 2022-11-24 23:21:38
  * @Description: file content
  * @FilePath: \BootLoader\menu.c
  */
 
 #include "gd32f4xx.h"
 #include "menu.h"
+#include "bsp_gpio.h"
+#include "systick.h"
 
 static pFunction Jump_To_Application;
 static uint32_t JumpAddress;
 
 static uint8_t tab_1024[PACKET_DATA_LENGTH] = {0};
-static uint8_t FileName[FILE_NAME_LENGTH] = {0};
 
 void SerialDownLoad(void);
 
@@ -84,6 +85,12 @@ void SerialDownLoad(void)
 
 void LoadRunApplication(void)
 {
+    PowerOffBmcPeriph();
+    ResetSerial();
+    ResetGpio();
+
+    delay_1ms(500);
+
     nvic_irq_disable(EXTI0_IRQn);
 
     JumpAddress = *(__IO uint32_t *)(APPLICATION_ADDRESS + 4); // application main address
