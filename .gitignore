@@ -32,3 +32,8 @@ Objects/systick.d
 Objects/systick.o
 Objects/ymodem.d
 Objects/ymodem.o
+.vscode/uv4.log
+Objects/BootLoader.axf
+Objects/BootLoader.htm
+Objects/menu.d
+Objects/menu.o
