@@ -2,7 +2,7 @@
  * @Author: Ma Yuchen
  * @Date: 2022-11-22 21:43:39
  * @LastEditors: Ma YuChen
- * @LastEditTime: 2022-11-24 11:11:37
+ * @LastEditTime: 2022-11-24 20:17:49
  * @Description: file content
  * @FilePath: \BootLoader\bsp_uart.c
  */
@@ -26,9 +26,10 @@
  */
 void InitSerial(void)
 {
+	rcu_periph_clock_enable(RCU_GPIOE);
     rcu_periph_clock_enable(RCU_UART6);
 	
-	nvic_irq_enable(UART6_IRQn, 2U,0U);
+	// nvic_irq_enable(UART6_IRQn, 2U,0U);
 	
 	gpio_mode_set(GPIOE, GPIO_MODE_AF, GPIO_PUPD_PULLUP,GPIO_PIN_8);	
 	gpio_mode_set(GPIOE, GPIO_MODE_AF, GPIO_PUPD_PULLUP,GPIO_PIN_7);
