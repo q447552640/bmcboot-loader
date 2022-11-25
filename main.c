@@ -44,8 +44,12 @@ int main(void)
     {
         RunApp();
     }
-
-    return 0;
+		
+		while(1)
+		{
+		}
+		
+		
 }
 
 int GetIAPIntper(void)

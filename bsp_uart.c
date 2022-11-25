@@ -2,7 +2,7 @@
  * @Author: Ma Yuchen
  * @Date: 2022-11-22 21:43:39
  * @LastEditors: Ma YuChen
- * @LastEditTime: 2022-11-24 23:21:04
+ * @LastEditTime: 2022-11-24 23:51:11
  * @Description: file content
  * @FilePath: \BootLoader\bsp_uart.c
  */
@@ -37,7 +37,6 @@ void InitSerial(void)
   gpio_output_options_set(GPIOE, GPIO_OTYPE_PP, GPIO_OSPEED_50MHZ, GPIO_PIN_8);
   gpio_af_set(GPIOE, GPIO_AF_8, GPIO_PIN_7 | GPIO_PIN_8);
 
-  usart_deinit(UART6);
   usart_baudrate_set(UART6, 115200U);
   usart_word_length_set(UART6, USART_WL_8BIT);
   usart_stop_bit_set(UART6, USART_STB_1BIT);
