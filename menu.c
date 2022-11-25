@@ -2,7 +2,7 @@
  * @Author: Ma Yuchen
  * @Date: 2022-11-24 10:03:28
  * @LastEditors: Ma YuChen
- * @LastEditTime: 2022-11-24 23:21:38
+ * @LastEditTime: 2022-11-25 15:19:15
  * @Description: file content
  * @FilePath: \BootLoader\menu.c
  */
@@ -26,6 +26,7 @@ void SerialDownLoad(void);
 void PrintMenu(void)
 {
     uint8_t key = 0;
+    uint8_t printProgramMenu=1;
 
     SerialPutString("\r\n=========================================================\r\n");
     SerialPutString("\r\n=                                                       =\r\n");
@@ -35,10 +36,14 @@ void PrintMenu(void)
 
     while (1)
     {
+        if(printProgramMenu!=0)
+        {
+            printProgramMenu=0;
         SerialPutString("\r\n========================Main Menu========================\r\n");
         SerialPutString("\r\n== Download Image To the GD32F4xx Internal Flash--------1\r\n");
         SerialPutString("\r\n== Exec New Program-------------------------------------2\r\n");
         SerialPutString("\r\n=========================================================\r\n");
+        }
 
         key = GetKey();
 
@@ -46,15 +51,21 @@ void PrintMenu(void)
         // Download Image & program in flash
         {
             SerialDownLoad();
+            printProgramMenu=1;
         }
         else if (key == 0x32)
         {
             LoadRunApplication();
+            printProgramMenu=1;
 						return ;
+        }
+        else if(key == 0x1B)
+        {
+
         }
         else
         {
-            SerialPutString("Invalid Num ! ==> The number should be either1,2\r\n");
+            SerialPutString("\r\nInvalid Num ! ==> The number should be either1,2\r\n");
         }
     }
 }

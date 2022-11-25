@@ -2,7 +2,7 @@
  * @Author: Ma Yuchen
  * @Date: 2022-11-22 21:03:02
  * @LastEditors: Ma YuChen
- * @LastEditTime: 2022-11-24 23:18:25
+ * @LastEditTime: 2022-11-25 15:22:21
  * @Description: file content
  * @FilePath: \BootLoader\main.c
  */
@@ -42,15 +42,13 @@ int main(void)
     //如果无请求则跳转到APP启动
     else
     {
-				SerialPutString("\r\nRun App...\r\n");
+		SerialPutString("\r\nRun App...\r\n");
         RunApp();
     }
 
-		while(1)
-		{
-		}
-		
-		
+	while(1)
+	{
+	}	
 }
 
 int GetIAPIntper(void)
