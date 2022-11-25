@@ -28,7 +28,7 @@ int main(void)
     InitGpio();
     PowerOnBmcPeriph();
     delay_1ms(10);
-    
+
     //初始化串口
     InitSerial();
 	
@@ -42,9 +42,10 @@ int main(void)
     //如果无请求则跳转到APP启动
     else
     {
+				SerialPutString("\r\nRun App...\r\n");
         RunApp();
     }
-		
+
 		while(1)
 		{
 		}
