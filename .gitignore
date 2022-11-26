@@ -37,3 +37,6 @@ Objects/BootLoader.axf
 Objects/BootLoader.htm
 Objects/menu.d
 Objects/menu.o
+Objects/BootLoader_sct.Bak
+Objects/bsp_gpio.d
+Objects/bsp_gpio.o
