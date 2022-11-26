@@ -2,7 +2,7 @@
  * @Author: Ma Yuchen
  * @Date: 2022-11-23 23:29:58
  * @LastEditors: Ma YuChen
- * @LastEditTime: 2022-11-24 22:29:46
+ * @LastEditTime: 2022-11-26 12:03:43
  * @Description: file content
  * @FilePath: \BootLoader\ymodem.c
  */
@@ -192,6 +192,7 @@ int Ymodem_Receive(uint8_t *buffer)
     while (yModemInfo.session_done == 0)
     {
         yModemInfo.pakcets_received=0;
+        yModemInfo.file_done=0;
         //packet
         while (yModemInfo.file_done == 0)
         {
@@ -267,10 +268,11 @@ int Ymodem_Receive(uint8_t *buffer)
                         //Data Packet
                         else
                         {
-														buf_ptr=buffer;
-                            memcpy(buf_ptr, yModemInfo.packet_data+PACKET_HEADER, (uint32_t)yModemInfo.packet_length);
+							// buf_ptr=buffer;
+                            // memcpy(buf_ptr, yModemInfo.packet_data+PACKET_HEADER, (uint32_t)yModemInfo.packet_length);
 
-                            ramSourceAddr=(uint32_t)buf_ptr;
+                            // ramSourceAddr=(uint32_t)buf_ptr;
+                            ramSourceAddr=(uint32_t)(yModemInfo.packet_data+PACKET_HEADER);
                             if(0 == Flash_IF_Write(&flashDestination, (uint32_t *)ramSourceAddr, yModemInfo.pakcets_received/4))
                             {
                                 Send_Byte(ACK);
@@ -295,7 +297,7 @@ int Ymodem_Receive(uint8_t *buffer)
                 return -3;
             default:
                 // 如果session已经开始
-                if (yModemInfo.session_begin != 0)
+                if (yModemInfo.session_begin > 0)
                 // 则累计一次错误计数
                 {
                     yModemInfo.errors++;
