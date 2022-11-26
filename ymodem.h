@@ -2,14 +2,14 @@
  * @Author: Ma Yuchen
  * @Date: 2022-11-23 23:30:07
  * @LastEditors: Ma YuChen
- * @LastEditTime: 2022-11-24 11:18:30
+ * @LastEditTime: 2022-11-24 18:51:22
  * @Description: Y Modem File Transport Protocol Define func
  *                  this Protocel can be used when uart is only IO interface on MCU
  * @FilePath: \BootLoader\ymodem.h
  */
 #ifndef Y_MODEM_H
 #define Y_MODEM_H
-
+#include <stdint.h>
 #include <string.h>
 
 /*Ymodem Frame base on ASCII Encode*/
@@ -32,10 +32,14 @@
 #define FILE_NAME_LENGTH    (256)
 #define FILE_SIZE_LENGTH    (16)
 
+#define PACKET_NO_INDEX     (1)
+#define PACKET_NO_N_INDEX   (2)
+
 
 #define NAK_TIMEOUT         (0x100000)
 #define MAX_ERRORS          (5)
 
+extern uint8_t FileName[];
 
 int Ymodem_Receive(uint8_t* buffer);
 
