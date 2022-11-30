@@ -10,7 +10,7 @@
       <TargetName>BootLoader</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6180000::V6.18::ARMCLANG</pCCUsed>
+      <pCCUsed>5060960::V5.06 update 7 (build 960)::ARMCC</pCCUsed>
       <uAC6>0</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -390,19 +390,9 @@
               <FilePath>.\bsp_uart.c</FilePath>
             </File>
             <File>
-              <FileName>bsp_uart.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\bsp_uart.h</FilePath>
-            </File>
-            <File>
               <FileName>systick.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\systick.c</FilePath>
-            </File>
-            <File>
-              <FileName>bsp_ocflash.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\bsp_ocflash.h</FilePath>
             </File>
             <File>
               <FileName>bsp_ocflash.c</FileName>
@@ -415,14 +405,14 @@
               <FilePath>.\ymodem.c</FilePath>
             </File>
             <File>
-              <FileName>ymodem.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\ymodem.h</FilePath>
-            </File>
-            <File>
               <FileName>bsp_gpio.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\bsp_gpio.c</FilePath>
+            </File>
+            <File>
+              <FileName>driverCrc16.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\driverCrc16.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -833,19 +823,9 @@
               <FilePath>.\bsp_uart.c</FilePath>
             </File>
             <File>
-              <FileName>bsp_uart.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\bsp_uart.h</FilePath>
-            </File>
-            <File>
               <FileName>systick.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\systick.c</FilePath>
-            </File>
-            <File>
-              <FileName>bsp_ocflash.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\bsp_ocflash.h</FilePath>
             </File>
             <File>
               <FileName>bsp_ocflash.c</FileName>
@@ -858,14 +838,14 @@
               <FilePath>.\ymodem.c</FilePath>
             </File>
             <File>
-              <FileName>ymodem.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\ymodem.h</FilePath>
-            </File>
-            <File>
               <FileName>bsp_gpio.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\bsp_gpio.c</FilePath>
+            </File>
+            <File>
+              <FileName>driverCrc16.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\driverCrc16.c</FilePath>
             </File>
           </Files>
         </Group>
