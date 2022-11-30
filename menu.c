@@ -2,7 +2,7 @@
  * @Author: Ma Yuchen
  * @Date: 2022-11-24 10:03:28
  * @LastEditors: Ma YuChen
- * @LastEditTime: 2022-11-30 19:34:36
+ * @LastEditTime: 2022-11-25 15:19:15
  * @Description: file content
  * @FilePath: \BootLoader\menu.c
  */
@@ -31,7 +31,7 @@ void PrintMenu(void)
     SerialPutString("=========================================================\r\n");
     SerialPutString("=                                                       =\r\n");
     SerialPutString("=  BMC GD32F4XX In-Application Programming Apllication  =\r\n");
-    SerialPutString("=                       V 0.0.3                         =\r\n");
+    SerialPutString("=                       V 0.0.1                         =\r\n");
     SerialPutString("=========================================================\r\n");
 
     while (1)
