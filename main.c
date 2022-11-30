@@ -2,7 +2,7 @@
  * @Author: Ma Yuchen
  * @Date: 2022-11-22 21:03:02
  * @LastEditors: Ma YuChen
- * @LastEditTime: 2022-11-30 19:34:44
+ * @LastEditTime: 2022-11-30 20:58:26
  * @Description: file content
  * @FilePath: \BootLoader\main.c
  */
@@ -37,8 +37,8 @@ int main(void)
 	
 		SerialPutString("\r\nThanks for use this bootLoader\r\n");
 
-    //if(GetIAPIntper() == 1)
-		if(1)
+    if(GetIAPIntper() == 1)
+	// if(1)
     //如果获取到IAP请求中断则打印菜单进行IAP操作
     {
         Flash_IF_Init();
