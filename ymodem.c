@@ -2,14 +2,13 @@
  * @Author: Ma Yuchen
  * @Date: 2022-11-23 23:29:58
  * @LastEditors: Ma YuChen
- * @LastEditTime: 2022-11-30 19:35:28
+ * @LastEditTime: 2022-11-26 18:26:40
  * @Description: file content
  * @FilePath: \BootLoader\ymodem.c
  */
 #include "ymodem.h"
 #include "bsp_ocflash.h"
 #include "bsp_uart.h"
-#include "driverCrc16.h"
 #include "systick.h"
 
 typedef struct _YModemInfo
@@ -60,6 +59,71 @@ static int Send_Byte(uint8_t c)
     return 0;
 }
 
+static uint16_t UpdateCrc16(uint16_t crcIn, uint8_t d)
+{
+	/*
+    uint8_t count = 8;
+    uint16_t newCrc = crc;
+    uint16_t data = d;
+
+    while ((count--) > 0)
+    {
+        if (newCrc & 0x8000)
+        {
+            newCrc <<= 1;
+            newCrc += (((data <<= 1) & 0x0400) != 0);
+            newCrc ^= 0x1021;
+        }
+        else
+        {
+            newCrc <<= 1;
+            newCrc += (((data <<= 1) & 0x0400) != 0);
+        }
+    }
+
+    return newCrc;
+		*/
+		 uint32_t crc = crcIn;
+ uint32_t in = d|0x100;
+
+ do
+ {
+ crc <<= 1;
+ in <<= 1;
+
+ if(in&0x100)
+    {
+ ++crc;
+    }
+    
+ if(crc&0x10000)
+    {
+ crc ^= 0x1021;
+ }
+ } while(!(in&0x10000));
+
+ return (crc&0xffffu);
+}
+
+static uint16_t ClcCrc16(const uint8_t *datas, int size)
+{
+    uint16_t crc = 0;
+
+    const uint8_t *endofDatas = datas + size;
+
+    while (datas < endofDatas)
+    {
+        crc = UpdateCrc16(crc, *datas);
+        datas++;
+    }
+    crc = UpdateCrc16(crc, 0);
+    crc = UpdateCrc16(crc, 0);
+
+    return (crc & (uint16_t)0xffff);
+}
+
+uint8_t debugData=0xff;
+
 /**
  * @brief
  *
@@ -78,16 +142,16 @@ static int Receive_Packet(uint8_t *buffer, int32_t *length, uint32_t timeout)
     uint16_t i, packet_size, computedcrc;
     uint8_t data;
     *length = 0;
-	int result=0;
-	// receive packet
-	usart_start_receive_block((uint32_t)buffer, PACKET_OVERHEAD+PACKET_DATA_LENGTH);
-	result = Receive_Byte(timeout);
+		int result=0;
+		
+		usart_start_receive_block((uint32_t)buffer, PACKET_OVERHEAD+PACKET_DATA_LENGTH);
+		result = Receive_Byte(timeout);
     if (result == 0)
     {
         return -1;
     }
 		//delay_1ms(50);
-	data=*buffer;
+		data=*buffer;
 		//SEGGER_RTT_printf(0,"%d:get Head %X result=%d\r\n",debugLoop++ , data, result);
     switch (data)
     {
@@ -111,22 +175,35 @@ static int Receive_Packet(uint8_t *buffer, int32_t *length, uint32_t timeout)
             return -1;
         }
     default:
+				debugData=data;
         return -3;
     }
 
+    //*buffer = data; // buffer store header in buffer[0];
+
+    // receive packet
+		/*
+    for (i = 1; i < packet_size; i++)
+    {
+        if (Receive_Byte(timeout) != 0)
+        {
+            return -4;
+        }
+    }
+	*/
     // check packet no
     if (buffer[PACKET_NO_INDEX] != ((buffer[PACKET_NO_N_INDEX] ^ 0xff) & 0xff))
     {
         return -2;
     }
-
-    computedcrc = CalcuCRC(&(buffer[PACKET_HEADER]), (int)packet_size);
+/*
+    computedcrc = ClcCrc16(buffer[PACKET_HEADER], (int)packet_size);
 
     if (computedcrc != (((uint16_t)buffer[packet_size + 3] << 8) | buffer[packet_size + 4]))
     {
         return -3;
     }
-
+*/
     *length = packet_size;
 
     return 0;
