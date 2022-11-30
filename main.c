@@ -2,7 +2,7 @@
  * @Author: Ma Yuchen
  * @Date: 2022-11-22 21:03:02
  * @LastEditors: Ma YuChen
- * @LastEditTime: 2022-11-26 15:00:32
+ * @LastEditTime: 2022-11-30 20:58:26
  * @Description: file content
  * @FilePath: \BootLoader\main.c
  */
@@ -11,6 +11,7 @@
 #include "bsp_gpio.h"
 #include "bsp_uart.h"
 #include "bsp_ocflash.h"
+#include "driverCrc16.h"
 #include "systick.h"
 
 extern pFunction Jump_To_Application;
@@ -24,6 +25,7 @@ int main(void)
 {
     //初始化Core时钟
     systick_config();
+    InitCRC();
 #ifndef BOARD_EVAL
     //初始化GPIO并打开V3.3外设供电
     InitGpio();
@@ -36,7 +38,7 @@ int main(void)
 		SerialPutString("\r\nThanks for use this bootLoader\r\n");
 
     if(GetIAPIntper() == 1)
-		//if(1)
+	// if(1)
     //如果获取到IAP请求中断则打印菜单进行IAP操作
     {
         Flash_IF_Init();
