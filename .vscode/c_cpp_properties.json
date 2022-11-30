@@ -447,7 +447,7 @@
                 "E:\\worspace\\arm\\gd32\\BMC\\BootLoader\\RTE\\_BootLoaderEval"
             ],
             "defines": [
-                "HXTAL_VALUE=12000000",
+                "HXTAL_VALUE=25000000",
                 "BOARD_EVAL",
                 "__alignof__(x)=",
                 "__asm(x)=",

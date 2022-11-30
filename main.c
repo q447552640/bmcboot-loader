@@ -2,7 +2,7 @@
  * @Author: Ma Yuchen
  * @Date: 2022-11-22 21:03:02
  * @LastEditors: Ma YuChen
- * @LastEditTime: 2022-11-26 11:49:43
+ * @LastEditTime: 2022-11-26 15:00:32
  * @Description: file content
  * @FilePath: \BootLoader\main.c
  */
@@ -24,17 +24,19 @@ int main(void)
 {
     //初始化Core时钟
     systick_config();
+#ifndef BOARD_EVAL
     //初始化GPIO并打开V3.3外设供电
     InitGpio();
     PowerOnBmcPeriph();
     delay_1ms(10);
-
+#endif
     //初始化串口
     InitSerial();
 	
 		SerialPutString("\r\nThanks for use this bootLoader\r\n");
 
     if(GetIAPIntper() == 1)
+		//if(1)
     //如果获取到IAP请求中断则打印菜单进行IAP操作
     {
         Flash_IF_Init();
@@ -43,7 +45,7 @@ int main(void)
     //如果无请求则跳转到APP启动
     else
     {
-		SerialPutString("\r\nRun App...\r\n");
+		SerialPutString("Run App...\r\n");
         RunApp();
     }
 

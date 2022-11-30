@@ -36,7 +36,8 @@
 #define PACKET_NO_N_INDEX   (2)
 
 
-#define NAK_TIMEOUT         (0x100000)
+//#define NAK_TIMEOUT         (0x100000)
+#define NAK_TIMEOUT         (500)
 #define MAX_ERRORS          (5)
 
 extern uint8_t FileName[];

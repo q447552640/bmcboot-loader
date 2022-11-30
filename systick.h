@@ -18,6 +18,8 @@
 void systick_config(void);
 /* delay a time in milliseconds */
 void delay_1ms(uint32_t count);
+/* delay a time in 100 us */
+void delay_100us(uint32_t count);
 /* delay decrement */
 void delay_decrement(void);
 

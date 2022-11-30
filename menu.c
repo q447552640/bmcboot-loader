@@ -28,24 +28,28 @@ void PrintMenu(void)
     uint8_t key = 0;
     uint8_t printProgramMenu=1;
 
-    SerialPutString("\r\n=========================================================\r\n");
-    SerialPutString("\r\n=                                                       =\r\n");
-    SerialPutString("\r\n=  BMC GD32F4XX In-Application Programming Apllication  =\r\n");
-    SerialPutString("\r\n=                       V 0.0.1                         =\r\n");
-    SerialPutString("\r\n=========================================================\r\n");
+    SerialPutString("=========================================================\r\n");
+    SerialPutString("=                                                       =\r\n");
+    SerialPutString("=  BMC GD32F4XX In-Application Programming Apllication  =\r\n");
+    SerialPutString("=                       V 0.0.1                         =\r\n");
+    SerialPutString("=========================================================\r\n");
 
     while (1)
     {
         if(printProgramMenu!=0)
         {
             printProgramMenu=0;
-        SerialPutString("\r\n========================Main Menu========================\r\n");
-        SerialPutString("\r\n== Download Image To the GD32F4xx Internal Flash--------1\r\n");
-        SerialPutString("\r\n== Exec New Program-------------------------------------2\r\n");
-        SerialPutString("\r\n=========================================================\r\n");
+        SerialPutString("========================Main Menu========================\r\n");
+        SerialPutString("== Download Image To the GD32F4xx Internal Flash--------1\r\n");
+        SerialPutString("== Exec New Program-------------------------------------2\r\n");
+        SerialPutString("=========================================================\r\n");
         }
 
         key = GetKey();
+				//usart_start_receive_block((uint32_t)&key,1);
+				
+				while(GetUsartReceiveFinish()==0)
+				{}
 
         if (key == 0x31)
         // Download Image & program in flash
@@ -55,6 +59,7 @@ void PrintMenu(void)
         }
         else if (key == 0x32)
         {
+						SerialPutString("======Run App======\r\n");
             LoadRunApplication();
             printProgramMenu=1;
 						return ;
@@ -65,7 +70,7 @@ void PrintMenu(void)
         }
         else
         {
-            SerialPutString("\r\nInvalid Num ! ==> The number should be either1,2\r\n");
+            SerialPutString("Invalid Num ! ==> The number should be either1,2\r\n");
         }
     }
 }
@@ -75,22 +80,22 @@ void SerialDownLoad(void)
     uint8_t Number[10]={0};
     int32_t Size=0;
 
-    SerialPutString("\r\n Waiting for file to be sent ...\r\n");
+    SerialPutString(" Waiting for file to be sent ...\r\n");
     Size=Ymodem_Receive(tab_1024);
 
     if(Size>0)
     {
-        SerialPutString("\r\n Programming Completed Successfully!\r\n Name: ");
+        SerialPutString(" Programming Completed Successfully!\r\n Name: ");
         SerialPutString(FileName);
         Int2Str(Number, Size);
-        SerialPutString("\r\n Size: ");
+        SerialPutString(" Size: ");
         SerialPutString(Number);
         SerialPutString("Bytes\r\n");
         SerialPutString("--------------------------\r\n");
     }
     else
     {
-        SerialPutString("\r\n Warning Receive File failed!!\r\n");
+        SerialPutString(" Warning Receive File failed!!\r\n");
     }
 }
 
@@ -103,6 +108,7 @@ void LoadRunApplication(void)
     delay_1ms(500);
 
     nvic_irq_disable(EXTI0_IRQn);
+		//__set_FAULTMASK(1);
 
     JumpAddress = *(__IO uint32_t *)(APPLICATION_ADDRESS + 4); // application main address
 

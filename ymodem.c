@@ -2,13 +2,14 @@
  * @Author: Ma Yuchen
  * @Date: 2022-11-23 23:29:58
  * @LastEditors: Ma YuChen
- * @LastEditTime: 2022-11-26 12:03:43
+ * @LastEditTime: 2022-11-26 18:26:40
  * @Description: file content
  * @FilePath: \BootLoader\ymodem.c
  */
 #include "ymodem.h"
 #include "bsp_ocflash.h"
 #include "bsp_uart.h"
+#include "systick.h"
 
 typedef struct _YModemInfo
 {
@@ -21,24 +22,35 @@ typedef struct _YModemInfo
     uint8_t pakcets_received;
     uint8_t file_done;
 
+    uint8_t finish_check;
+
     uint8_t packet_data[PACKET_OVERHEAD + PACKET_DATA_LENGTH];
 	
-		uint8_t revice[2];
+	uint8_t revice;
 } YModemInfo;
 
 uint8_t FileName[FILE_NAME_LENGTH] = {0};
 
-static int Receive_Byte(uint8_t *c, uint32_t timeout)
+static int Receive_Byte(uint32_t timeout)
 {
     while (timeout-- > 0)
     {
-        if (1 == SerialKeyPressed(c))
+			/*
+        if (1 == GetUsartReceiveFinish())
         {
             return 0;
-        }
+        }*/
+				switch(GetUsartReceiveFinish())
+				{
+					case 1:
+						return 1;
+					case 2:
+						return 2;
+				}
+				delay_1ms(2);
     }
 
-    return -1;
+    return 0;
 }
 
 static int Send_Byte(uint8_t c)
@@ -47,8 +59,9 @@ static int Send_Byte(uint8_t c)
     return 0;
 }
 
-static uint16_t UpdateCrc16(uint16_t crc, uint8_t d)
+static uint16_t UpdateCrc16(uint16_t crcIn, uint8_t d)
 {
+	/*
     uint8_t count = 8;
     uint16_t newCrc = crc;
     uint16_t data = d;
@@ -69,6 +82,27 @@ static uint16_t UpdateCrc16(uint16_t crc, uint8_t d)
     }
 
     return newCrc;
+		*/
+		 uint32_t crc = crcIn;
+ uint32_t in = d|0x100;
+
+ do
+ {
+ crc <<= 1;
+ in <<= 1;
+
+ if(in&0x100)
+    {
+ ++crc;
+    }
+    
+ if(crc&0x10000)
+    {
+ crc ^= 0x1021;
+ }
+ } while(!(in&0x10000));
+
+ return (crc&0xffffu);
 }
 
 static uint16_t ClcCrc16(const uint8_t *datas, int size)
@@ -88,6 +122,8 @@ static uint16_t ClcCrc16(const uint8_t *datas, int size)
     return (crc & (uint16_t)0xffff);
 }
 
+uint8_t debugData=0xff;
+
 /**
  * @brief
  *
@@ -100,17 +136,23 @@ static uint16_t ClcCrc16(const uint8_t *datas, int size)
  *          -2 packet no error
  *          -3 crc error
  */
+static int debugLoop=0;
 static int Receive_Packet(uint8_t *buffer, int32_t *length, uint32_t timeout)
 {
     uint16_t i, packet_size, computedcrc;
     uint8_t data;
     *length = 0;
-
-    if (Receive_Byte(&data, timeout) != 0)
+		int result=0;
+		
+		usart_start_receive_block((uint32_t)buffer, PACKET_OVERHEAD+PACKET_DATA_LENGTH);
+		result = Receive_Byte(timeout);
+    if (result == 0)
     {
         return -1;
     }
-
+		//delay_1ms(50);
+		data=*buffer;
+		//SEGGER_RTT_printf(0,"%d:get Head %X result=%d\r\n",debugLoop++ , data, result);
     switch (data)
     {
     case SOH:
@@ -119,9 +161,11 @@ static int Receive_Packet(uint8_t *buffer, int32_t *length, uint32_t timeout)
     case STX:
         packet_size = PACKET_DATA_LENGTH;
         break;
+    case EOT:
+        return 0;
     case CAN:
     //if two CAN return length -1
-        if((Receive_Byte(&data, timeout) == 0) && (CAN == data))
+        if(CAN == *(buffer+1))
         {
             *length=-1;
             return 0;
@@ -130,36 +174,36 @@ static int Receive_Packet(uint8_t *buffer, int32_t *length, uint32_t timeout)
         {
             return -1;
         }
-    case EOT:
-        return 0;
     default:
-        return -1;
+				debugData=data;
+        return -3;
     }
 
-    *buffer = data; // buffer store header in buffer[0];
+    //*buffer = data; // buffer store header in buffer[0];
 
     // receive packet
+		/*
     for (i = 1; i < packet_size; i++)
     {
-        if (Receive_Byte(buffer + i, timeout) != 0)
+        if (Receive_Byte(timeout) != 0)
         {
-            return -1;
+            return -4;
         }
     }
-
+	*/
     // check packet no
     if (buffer[PACKET_NO_INDEX] != ((buffer[PACKET_NO_N_INDEX] ^ 0xff) & 0xff))
     {
         return -2;
     }
-
+/*
     computedcrc = ClcCrc16(buffer[PACKET_HEADER], (int)packet_size);
 
     if (computedcrc != (((uint16_t)buffer[packet_size + 3] << 8) | buffer[packet_size + 4]))
     {
         return -3;
     }
-
+*/
     *length = packet_size;
 
     return 0;
@@ -183,20 +227,21 @@ int Ymodem_Receive(uint8_t *buffer)
 		//int fileLength = 0;
     uint32_t flashDestination = APPLICATION_ADDRESS;
     uint32_t ramSourceAddr=0;
+		int result=0;
 
     memset(&yModemInfo, 0, sizeof(YModemInfo));
-
-
 
     //session
     while (yModemInfo.session_done == 0)
     {
         yModemInfo.pakcets_received=0;
         yModemInfo.file_done=0;
+        yModemInfo.finish_check=0;
         //packet
         while (yModemInfo.file_done == 0)
         {
-            switch (Receive_Packet(yModemInfo.packet_data, &(yModemInfo.packet_length), NAK_TIMEOUT))
+						result=Receive_Packet(yModemInfo.packet_data, &(yModemInfo.packet_length), NAK_TIMEOUT);
+            switch (result)
             {
             case 0:
                 yModemInfo.errors=0;
@@ -210,8 +255,16 @@ int Ymodem_Receive(uint8_t *buffer)
                     return 0;
                     //End of this file transmission
                 case 0:
-                    Send_Byte(ACK);
-                    yModemInfo.file_done=1;
+                    if(yModemInfo.finish_check==0)
+                    {
+                        Send_Byte(NAK);
+                        yModemInfo.finish_check=1;
+                    }
+                    else
+                    {
+                        Send_Byte(ACK);
+                        yModemInfo.file_done=1;
+                    }
                     break;
                 default://Normal Packet
                     //Check receive pakcet number 
@@ -273,7 +326,7 @@ int Ymodem_Receive(uint8_t *buffer)
 
                             // ramSourceAddr=(uint32_t)buf_ptr;
                             ramSourceAddr=(uint32_t)(yModemInfo.packet_data+PACKET_HEADER);
-                            if(0 == Flash_IF_Write(&flashDestination, (uint32_t *)ramSourceAddr, yModemInfo.pakcets_received/4))
+                            if(0 == Flash_IF_Write(&flashDestination, (uint32_t *)ramSourceAddr, yModemInfo.packet_length/4))
                             {
                                 Send_Byte(ACK);
                             }
@@ -309,7 +362,6 @@ int Ymodem_Receive(uint8_t *buffer)
                     Send_Byte(CAN);
                     return 0;
                 }
-
                 Send_Byte(CRC16); // Send ‘C' to CommInit
                 break;
             }
