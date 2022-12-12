@@ -30,6 +30,7 @@
 void InitSerial(void)
 {
   rcu_periph_clock_enable(USER_RCU_GPIO_TX);
+	rcu_periph_clock_enable(USER_RCU_GPIO_RX);
   rcu_periph_clock_enable(USER_RCU_UART);
 
   // nvic_irq_enable(UART6_IRQn, 2U,0U);
@@ -38,7 +39,8 @@ void InitSerial(void)
   gpio_mode_set(USER_UART_RX_PORT, GPIO_MODE_AF, GPIO_PUPD_PULLUP, USER_UART_RX_PIN);
 
   gpio_output_options_set(USER_UART_TX_PORT, GPIO_OTYPE_PP, GPIO_OSPEED_50MHZ, USER_UART_TX_PIN);
-  gpio_af_set(USER_UART_TX_PORT, USER_UART_GPIO_AF, USER_UART_TX_PIN | USER_UART_RX_PIN);
+  gpio_af_set(USER_UART_TX_PORT, USER_UART_GPIO_AF_TX, USER_UART_TX_PIN);
+	gpio_af_set(USER_UART_RX_PORT, USER_UART_GPIO_AF_RX, USER_UART_RX_PIN);
 	
 	  usart_deinit(USER_UART);
 
@@ -62,6 +64,7 @@ void ResetSerial(void)
 {
   usart_deinit(USER_UART);
   gpio_deinit(USER_UART_TX_PORT);
+	gpio_deinit(USER_UART_RX_PORT);
 	dma_deinit(USER_DMA, USER_DMA_CHANNEL);
 	
 	rcu_periph_clock_disable(USER_RCU_DMA);

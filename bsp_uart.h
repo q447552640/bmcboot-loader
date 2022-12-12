@@ -26,8 +26,9 @@
 
     #define USER_UART_TX_PIN     GPIO_PIN_8
     #define USER_UART_RX_PIN     GPIO_PIN_7
-
-    #define USER_UART_GPIO_AF   GPIO_AF_8
+		
+    #define USER_UART_GPIO_AF_TX   GPIO_AF_8
+		#define USER_UART_GPIO_AF_RX   GPIO_AF_8
 		
 		#define USER_RCU_DMA				RCU_DMA0
 		#define USER_DMA						DMA0
@@ -46,7 +47,8 @@
     #define USER_UART_TX_PIN     GPIO_PIN_9
     #define USER_UART_RX_PIN     GPIO_PIN_10
 
-    #define USER_UART_GPIO_AF   GPIO_AF_7
+    #define USER_UART_GPIO_AF_TX   GPIO_AF_7
+		#define USER_UART_GPIO_AF_RX   GPIO_AF_7
 		
 		#define USER_RCU_DMA				RCU_DMA1
 		#define USER_DMA						DMA1
