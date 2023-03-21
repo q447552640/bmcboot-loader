@@ -1,8 +1,8 @@
 /*
  * @Author: Ma Yuchen
  * @Date: 2022-11-22 21:43:50
- * @LastEditors: Ma YuChen
- * @LastEditTime: 2022-11-26 18:39:20
+ * @LastEditors: jimma0312 jimma0312@outlook.com
+ * @LastEditTime: 2023-03-22 00:00:51
  * @Description: file content
  * @FilePath: \BootLoader\bsp_uart.h
  */
@@ -13,6 +13,24 @@
 #include "gd32f4xx.h"
 
 #define SerialPutString(x) Serial_PutString((uint8_t *)x)
+
+/*
+* 根据逻辑图纸修改以下宏定义（非常重要）
+* USER_RCU_UART     uart时钟
+* USER_RCU_GPIO_TX  uart_tx 所在GPIO时钟
+* USER_RCU_GPIO_RX  uart_rx 所在GPIO时钟
+* USER_UART         uart 外设
+* USER_UART_TX_PORT uart_tx 所在GPIO的组
+* USER_UART_RX_PORT uart_rx 所在GPIO的组
+* USER_UART_TX_PIN  uart_tx GPIO 引脚
+* USER_UART_RX_PIN  uart_rx GPIO 引脚
+* USER_UART_GPIO_AF_TX uart_tx GPIO 复用配置
+* USER_UART_GPIO_AF_RX uart_rx GPIO 复用配置
+* USER_RCU_DMA      DMA时钟
+* USER_DMA          DMA 外设
+* USER_DMA_CHANNEL  uart 使用的DMA通道
+* USER_DMA_SUBPERI  uart 使用的DAM通道的子配置
+*/
 
 #ifndef BOARD_EVAL
     #define USER_RCU_UART        RCU_UART6

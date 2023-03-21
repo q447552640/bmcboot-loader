@@ -10,6 +10,10 @@
 
 #include <gd32f4xx_fmc.h>
 
+/**
+ * @description: 初始化MCU内部Flash操作模块
+ * @return {*}
+ */
 void Flash_IF_Init(void)
 {
     fmc_unlock();

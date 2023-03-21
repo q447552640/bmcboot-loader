@@ -1,8 +1,8 @@
 /*
  * @Author: Ma Yuchen
  * @Date: 2022-11-23 23:29:58
- * @LastEditors: Ma YuChen
- * @LastEditTime: 2022-11-30 19:35:28
+ * @LastEditors: jimma0312 jimma0312@outlook.com
+ * @LastEditTime: 2023-03-21 22:19:21
  * @Description: file content
  * @FilePath: \BootLoader\ymodem.c
  */
@@ -36,19 +36,16 @@ static int Receive_Byte(uint32_t timeout)
 {
     while (timeout-- > 0)
     {
-			/*
-        if (1 == GetUsartReceiveFinish())
+        switch (GetUsartReceiveFinish())
         {
-            return 0;
-        }*/
-				switch(GetUsartReceiveFinish())
-				{
-					case 1:
-						return 1;
-					case 2:
-						return 2;
-				}
-				delay_1ms(2);
+        case 1:
+            return 1;
+        case 2:
+            return 2;
+        default:
+            delay_1ms(2);
+            break;
+        }
     }
 
     return 0;

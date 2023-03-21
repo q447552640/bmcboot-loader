@@ -35,10 +35,9 @@ int main(void)
     //初始化串口
     InitSerial();
 	
-		SerialPutString("\r\nThanks for use this bootLoader\r\n");
+	SerialPutString("\r\nThanks for use this bootLoader\r\n");
 
     if(GetIAPIntper() == 1)
-	// if(1)
     //如果获取到IAP请求中断则打印菜单进行IAP操作
     {
         Flash_IF_Init();

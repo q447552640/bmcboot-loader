@@ -1,9 +1,9 @@
 /*
  * @Author: Ma Yuchen
  * @Date: 2022-11-24 23:09:29
- * @LastEditors: Ma YuChen
- * @LastEditTime: 2022-11-25 00:18:25
- * @Description: file content
+ * @LastEditors: jimma0312 jimma0312@outlook.com
+ * @LastEditTime: 2023-03-15 23:36:57
+ * @Description: 实现板卡GPIO控制
  * @FilePath: \BootLoader\bsp_gpio.c
  */
 

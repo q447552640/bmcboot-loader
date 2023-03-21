@@ -1,8 +1,8 @@
 /*
  * @Author: Ma Yuchen
  * @Date: 2022-11-24 10:03:28
- * @LastEditors: Ma YuChen
- * @LastEditTime: 2022-11-30 20:47:31
+ * @LastEditors: jimma0312 jimma0312@outlook.com
+ * @LastEditTime: 2023-03-21 22:14:24
  * @Description: file content
  * @FilePath: \BootLoader\menu.c
  */
@@ -46,10 +46,9 @@ void PrintMenu(void)
         }
 
         key = GetKey();
-				//usart_start_receive_block((uint32_t)&key,1);
 				
-				while(GetUsartReceiveFinish()==0)
-				{}
+		while(GetUsartReceiveFinish()==0)
+		{;}
 
         if (key == 0x31)
         // Download Image & program in flash

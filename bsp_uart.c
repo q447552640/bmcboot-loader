@@ -1,8 +1,8 @@
 /*
  * @Author: Ma Yuchen
  * @Date: 2022-11-22 21:43:39
- * @LastEditors: Ma YuChen
- * @LastEditTime: 2022-11-26 14:57:24
+ * @LastEditors: jimma0312 jimma0312@outlook.com
+ * @LastEditTime: 2023-03-21 23:31:45
  * @Description: file content
  * @FilePath: \BootLoader\bsp_uart.c
  */
@@ -147,7 +147,7 @@ int Int2Str(uint8_t *str, int32_t intnum)
 
 /**
  * @brief Intel String trans to Integer
- *
+ * @authors STM
  * @param inputstr
  * @param intnum
  * @return int
@@ -235,6 +235,12 @@ int Str2Int(uint8_t *inputstr, int32_t *intnum)
   return res;
 }
 
+/**
+ * @description: 启动DMA接收UART RX消息
+ * @param {uint32_t} bufferAddress
+ * @param {uint32_t} size
+ * @return {*}
+ */
 void usart_start_receive_block(uint32_t bufferAddress, uint32_t size)
 {
 	dma_single_data_parameter_struct dma_data_paramter;
@@ -270,17 +276,25 @@ void usart_start_receive_block(uint32_t bufferAddress, uint32_t size)
 	*/
 }
 
+/**
+ * @description: 串口 RX是否结束
+ * @return {*}
+ */
 int GetUsartReceiveFinish(void)
 {
 	int result=0;
+  //在一个帧时间内，RX引脚检测到空闲状态，会将IDLEF置为 1
 	if(usart_flag_get(USER_UART, USART_FLAG_IDLEF) ==SET)
 	{
-		//usart_flag_clear(USER_UART, USART_FLAG_IDLEF);
+    //根据手册
+    //通过读寄存器操作，清除IDLEF位
 		usart_data_receive(USER_UART);
 		result= 1;
 	}
+  //当DMA数据满时，该状态标志有效
 	if(dma_flag_get(USER_DMA, USER_DMA_CHANNEL, DMA_INTF_FTFIF)==SET)
 	{
+    //清除状态标志
 		dma_flag_clear(USER_DMA, USER_DMA_CHANNEL, DMA_INTF_FEEIF);
 		result= 2;
 	}
