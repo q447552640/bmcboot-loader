@@ -432,11 +432,6 @@
               <FileType>1</FileType>
               <FilePath>.\bootLoader.c</FilePath>
             </File>
-            <File>
-              <FileName>bootLoader.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\bootLoader.h</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -872,11 +867,6 @@
               <FileName>bootLoader.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\bootLoader.c</FilePath>
-            </File>
-            <File>
-              <FileName>bootLoader.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\bootLoader.h</FilePath>
             </File>
           </Files>
         </Group>
