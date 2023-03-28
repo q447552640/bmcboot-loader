@@ -124,7 +124,7 @@ void Serial_PutString(uint8_t *s)
   }
 }
 
-int Int2Str(uint8_t *str, int32_t intnum)
+void Int2Str(uint8_t *str, int32_t intnum)
 {
   uint32_t i, Div = 1000000000, j = 0, Status = 0;
 

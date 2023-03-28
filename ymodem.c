@@ -69,10 +69,9 @@ static int Send_Byte(uint8_t c)
  *          -2 packet no error
  *          -3 crc error
  */
-static int debugLoop=0;
 static int Receive_Packet(uint8_t *buffer, int32_t *length, uint32_t timeout)
 {
-    uint16_t i, packet_size, computedcrc;
+    uint16_t packet_size, computedcrc;
     uint8_t data;
     *length = 0;
 	int result=0;
@@ -117,7 +116,7 @@ static int Receive_Packet(uint8_t *buffer, int32_t *length, uint32_t timeout)
         return -2;
     }
 
-    computedcrc = CalcuCRC(&(buffer[PACKET_HEADER]), (int)packet_size);
+    computedcrc = CalcuCRC((char *)&(buffer[PACKET_HEADER]), (int)packet_size);
 
     if (computedcrc != (((uint16_t)buffer[packet_size + 3] << 8) | buffer[packet_size + 4]))
     {
@@ -134,14 +133,12 @@ static int Receive_Packet(uint8_t *buffer, int32_t *length, uint32_t timeout)
  *          1.接收数据包 如果是第一次能判定为文件信息描述包
  *          2.接收所有的数据数据包，如果接收到合法的数据包，则提取数据后，直接烧写flash中
  *
- * @param buffer
  * @return int
  */
-int Ymodem_Receive(uint8_t *buffer)
+int Ymodem_Receive(void)
 {
     YModemInfo yModemInfo;
     int i;
-    uint8_t* buf_ptr;
     uint8_t* file_ptr;
     uint8_t fileSizeStr[FILE_SIZE_LENGTH]={0};
 		//int fileLength = 0;

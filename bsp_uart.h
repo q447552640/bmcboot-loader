@@ -84,7 +84,7 @@ void Serial_PutString(uint8_t* s);
 uint32_t SerialKeyPressed(uint8_t* key);
 
 
-int Int2Str(uint8_t* str, int32_t intnum);
+void Int2Str(uint8_t* str, int32_t intnum);
 int Str2Int(uint8_t *inputstr, int32_t *intnum);
 void usart_start_receive_block(uint32_t bufferAddress, uint32_t size);
 int GetUsartReceiveFinish(void);

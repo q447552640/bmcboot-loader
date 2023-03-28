@@ -42,6 +42,6 @@
 
 extern uint8_t FileName[];
 
-int Ymodem_Receive(uint8_t* buffer);
+int Ymodem_Receive(void);
 
 #endif

@@ -12,10 +12,6 @@
 #include "bsp_gpio.h"
 #include "systick.h"
 
-static pFunction Jump_To_Application;
-static uint32_t JumpAddress;
-
-static uint8_t tab_1024[PACKET_DATA_LENGTH] = {0};
 
 void SerialDownLoad(void);
 
@@ -80,7 +76,7 @@ void SerialDownLoad(void)
     int32_t Size=0;
 
     SerialPutString(" Waiting for file to be sent ...\r\n");
-    Size=Ymodem_Receive(tab_1024);
+    Size=Ymodem_Receive();
 
     if(Size>0)
     {
@@ -98,23 +94,4 @@ void SerialDownLoad(void)
     }
 }
 
-void LoadRunApplication(void)
-{
-    PowerOffBmcPeriph();
-    ResetSerial();
-    ResetGpio();
 
-    delay_1ms(500);
-
-    nvic_irq_disable(EXTI0_IRQn);
-		//__set_FAULTMASK(1);
-
-    JumpAddress = *(__IO uint32_t *)(APPLICATION_ADDRESS + 4); // application main address
-
-    Jump_To_Application = (pFunction)JumpAddress;
-
-    // 初始化Application的栈指针
-    __set_MSP(*(__IO uint32_t *)APPLICATION_ADDRESS);
-
-    Jump_To_Application();
-}
