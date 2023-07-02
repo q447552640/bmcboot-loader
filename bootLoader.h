@@ -15,4 +15,4 @@ void RunApp(void);
 int ExistApplication(void);
 void LoadRunApplication(void);
 
-#endif //BOOTLOADER_H
+#endif // BOOTLOADER_H

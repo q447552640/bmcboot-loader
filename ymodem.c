@@ -14,7 +14,7 @@
 
 typedef struct _YModemInfo
 {
-	  int packet_length;
+    int packet_length;
     int file_size;
     uint8_t session_done;
     uint8_t session_begin;
@@ -26,8 +26,8 @@ typedef struct _YModemInfo
     uint8_t finish_check;
 
     uint8_t packet_data[PACKET_OVERHEAD + PACKET_DATA_LENGTH];
-	
-	uint8_t revice;
+
+    uint8_t revice;
 } YModemInfo;
 
 uint8_t FileName[FILE_NAME_LENGTH] = {0};
@@ -74,17 +74,17 @@ static int Receive_Packet(uint8_t *buffer, int32_t *length, uint32_t timeout)
     uint16_t packet_size, computedcrc;
     uint8_t data;
     *length = 0;
-	int result=0;
-	// receive packet
-	usart_start_receive_block((uint32_t)buffer, PACKET_OVERHEAD+PACKET_DATA_LENGTH);
-	result = Receive_Byte(timeout);
+    int result = 0;
+    // receive packet
+    usart_start_receive_block((uint32_t)buffer, PACKET_OVERHEAD + PACKET_DATA_LENGTH);
+    result = Receive_Byte(timeout);
     if (result == 0)
     {
         return -1;
     }
-		//delay_1ms(50);
-	data=*buffer;
-		//SEGGER_RTT_printf(0,"%d:get Head %X result=%d\r\n",debugLoop++ , data, result);
+    // delay_1ms(50);
+    data = *buffer;
+    // SEGGER_RTT_printf(0,"%d:get Head %X result=%d\r\n",debugLoop++ , data, result);
     switch (data)
     {
     case SOH:
@@ -96,10 +96,10 @@ static int Receive_Packet(uint8_t *buffer, int32_t *length, uint32_t timeout)
     case EOT:
         return 0;
     case CAN:
-    //if two CAN return length -1
-        if(CAN == *(buffer+1))
+        // if two CAN return length -1
+        if (CAN == *(buffer + 1))
         {
-            *length=-1;
+            *length = -1;
             return 0;
         }
         else
@@ -139,84 +139,84 @@ int Ymodem_Receive(void)
 {
     YModemInfo yModemInfo;
     int i;
-    uint8_t* file_ptr;
-    uint8_t fileSizeStr[FILE_SIZE_LENGTH]={0};
-		//int fileLength = 0;
+    uint8_t *file_ptr;
+    uint8_t fileSizeStr[FILE_SIZE_LENGTH] = {0};
+    // int fileLength = 0;
     uint32_t flashDestination = APPLICATION_ADDRESS;
-    uint32_t ramSourceAddr=0;
-		int result=0;
+    uint32_t ramSourceAddr = 0;
+    int result = 0;
 
     memset(&yModemInfo, 0, sizeof(YModemInfo));
 
-    //session
+    // session
     while (yModemInfo.session_done == 0)
     {
-        yModemInfo.pakcets_received=0;
-        yModemInfo.file_done=0;
-        yModemInfo.finish_check=0;
-        //packet
+        yModemInfo.pakcets_received = 0;
+        yModemInfo.file_done = 0;
+        yModemInfo.finish_check = 0;
+        // packet
         while (yModemInfo.file_done == 0)
         {
-						result=Receive_Packet(yModemInfo.packet_data, &(yModemInfo.packet_length), NAK_TIMEOUT);
+            result = Receive_Packet(yModemInfo.packet_data, &(yModemInfo.packet_length), NAK_TIMEOUT);
             switch (result)
             {
             case 0:
-                yModemInfo.errors=0;
+                yModemInfo.errors = 0;
 
                 switch (yModemInfo.packet_length)
                 {
-                    //CAN 
-                    //abort by Sender
+                    // CAN
+                    // abort by Sender
                 case -1:
                     Send_Byte(ACK);
                     return 0;
-                    //End of this file transmission
+                    // End of this file transmission
                 case 0:
-                    if(yModemInfo.finish_check==0)
+                    if (yModemInfo.finish_check == 0)
                     {
                         Send_Byte(NAK);
-                        yModemInfo.finish_check=1;
+                        yModemInfo.finish_check = 1;
                     }
                     else
                     {
                         Send_Byte(ACK);
-                        yModemInfo.file_done=1;
+                        yModemInfo.file_done = 1;
                     }
                     break;
-                default://Normal Packet
-                    //Check receive pakcet number 
-                    if((yModemInfo.packet_data[PACKET_NO_INDEX] & 0xff) != (yModemInfo.pakcets_received & 0xff))
+                default: // Normal Packet
+                    // Check receive pakcet number
+                    if ((yModemInfo.packet_data[PACKET_NO_INDEX] & 0xff) != (yModemInfo.pakcets_received & 0xff))
                     {
                         Send_Byte(NAK);
                     }
                     else
                     {
-                        if(yModemInfo.pakcets_received==0)
-                        //Filename Packet
+                        if (yModemInfo.pakcets_received == 0)
+                        // Filename Packet
                         {
-                            if(yModemInfo.packet_data[PACKET_HEADER] !=0)
+                            if (yModemInfo.packet_data[PACKET_HEADER] != 0)
                             {
-                                for(i=0, file_ptr=yModemInfo.packet_data+PACKET_HEADER;
-                                    (*file_ptr!=0) && i<FILE_NAME_LENGTH;)
+                                for (i = 0, file_ptr = yModemInfo.packet_data + PACKET_HEADER;
+                                     (*file_ptr != 0) && i < FILE_NAME_LENGTH;)
                                 {
-                                    FileName[i++]=*file_ptr++;
+                                    FileName[i++] = *file_ptr++;
                                 }
 
-                                FileName[i++]='\0';
+                                FileName[i++] = '\0';
 
-                                for (i=0, file_ptr++; (*file_ptr != ' ') && (*file_ptr!=0) && (i<FILE_SIZE_LENGTH-1);)
+                                for (i = 0, file_ptr++; (*file_ptr != ' ') && (*file_ptr != 0) && (i < FILE_SIZE_LENGTH - 1);)
                                 {
-                                    fileSizeStr[i++]=*file_ptr++;
+                                    fileSizeStr[i++] = *file_ptr++;
                                 }
-                                fileSizeStr[i++]='\0';
+                                fileSizeStr[i++] = '\0';
 
                                 Str2Int(fileSizeStr, &yModemInfo.file_size);
 
-                                //check the size of image 
-                                //if size greater than user can flash size
-                                if(yModemInfo.file_size > (int32_t)(USER_FLASH_SIZE))
+                                // check the size of image
+                                // if size greater than user can flash size
+                                if (yModemInfo.file_size > (int32_t)(USER_FLASH_SIZE))
                                 {
-                                    //end session
+                                    // end session
                                     Send_Byte(CAN);
                                     Send_Byte(CAN);
 
@@ -230,20 +230,20 @@ int Ymodem_Receive(void)
                             else
                             {
                                 Send_Byte(ACK);
-                                yModemInfo.file_done=1;
-                                yModemInfo.session_done=1;
+                                yModemInfo.file_done = 1;
+                                yModemInfo.session_done = 1;
                                 break;
                             }
                         }
-                        //Data Packet
+                        // Data Packet
                         else
                         {
-							// buf_ptr=buffer;
+                            // buf_ptr=buffer;
                             // memcpy(buf_ptr, yModemInfo.packet_data+PACKET_HEADER, (uint32_t)yModemInfo.packet_length);
 
                             // ramSourceAddr=(uint32_t)buf_ptr;
-                            ramSourceAddr=(uint32_t)(yModemInfo.packet_data+PACKET_HEADER);
-                            if(0 == Flash_IF_Write(&flashDestination, (uint32_t *)ramSourceAddr, yModemInfo.packet_length/4))
+                            ramSourceAddr = (uint32_t)(yModemInfo.packet_data + PACKET_HEADER);
+                            if (0 == Flash_IF_Write(&flashDestination, (uint32_t *)ramSourceAddr, yModemInfo.packet_length / 4))
                             {
                                 Send_Byte(ACK);
                             }
@@ -256,7 +256,7 @@ int Ymodem_Receive(void)
                         }
 
                         yModemInfo.pakcets_received++;
-                        yModemInfo.session_begin=1;
+                        yModemInfo.session_begin = 1;
                     }
                     break;
                 }

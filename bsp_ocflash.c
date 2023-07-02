@@ -42,10 +42,10 @@ int Flash_IF_App_Erase(int StartSectorId, int EndSectorId)
 
 /**
  * @brief 按照4字节单位将缓存区数据烧写到Flash
- * 
+ *
  * @param address [in out] 传输地址的指针
  * @param buffer [in] 数据缓存区
- * @param length [in] 数据缓存区长度 
+ * @param length [in] 数据缓存区长度
  * @return int 0 正确 -1 烧写错误 -2 回读错误
  */
 int Flash_IF_Write(__IO uint32_t *address, uint32_t *buffer, int length)

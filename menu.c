@@ -12,7 +12,6 @@
 #include "bsp_gpio.h"
 #include "systick.h"
 
-
 void SerialDownLoad(void);
 
 /**
@@ -22,7 +21,7 @@ void SerialDownLoad(void);
 void PrintMenu(void)
 {
     uint8_t key = 0;
-    uint8_t printProgramMenu=1;
+    uint8_t printProgramMenu = 1;
 
     SerialPutString("=========================================================\r\n");
     SerialPutString("=                                                       =\r\n");
@@ -32,36 +31,37 @@ void PrintMenu(void)
 
     while (1)
     {
-        if(printProgramMenu!=0)
+        if (printProgramMenu != 0)
         {
-            printProgramMenu=0;
-        SerialPutString("========================Main Menu========================\r\n");
-        SerialPutString("== Download Image To the GD32F4xx Internal Flash--------1\r\n");
-        SerialPutString("== Exec New Program-------------------------------------2\r\n");
-        SerialPutString("=========================================================\r\n");
+            printProgramMenu = 0;
+            SerialPutString("========================Main Menu========================\r\n");
+            SerialPutString("== Download Image To the GD32F4xx Internal Flash--------1\r\n");
+            SerialPutString("== Exec New Program-------------------------------------2\r\n");
+            SerialPutString("=========================================================\r\n");
         }
 
         key = GetKey();
-				
-		while(GetUsartReceiveFinish()==0)
-		{;}
+
+        while (GetUsartReceiveFinish() == 0)
+        {
+            ;
+        }
 
         if (key == 0x31)
         // Download Image & program in flash
         {
             SerialDownLoad();
-            printProgramMenu=1;
+            printProgramMenu = 1;
         }
         else if (key == 0x32)
         {
-						SerialPutString("======Run App======\r\n");
+            SerialPutString("======Run App======\r\n");
             LoadRunApplication();
-            printProgramMenu=1;
-						return ;
+            printProgramMenu = 1;
+            return;
         }
-        else if(key == 0x1B)
+        else if (key == 0x1B)
         {
-
         }
         else
         {
@@ -72,13 +72,13 @@ void PrintMenu(void)
 
 void SerialDownLoad(void)
 {
-    uint8_t Number[10]={0};
-    int32_t Size=0;
+    uint8_t Number[10] = {0};
+    int32_t Size = 0;
 
     SerialPutString(" Waiting for file to be sent ...\r\n");
-    Size=Ymodem_Receive();
+    Size = Ymodem_Receive();
 
-    if(Size>0)
+    if (Size > 0)
     {
         SerialPutString(" Programming Completed Successfully!\r\n Name: ");
         SerialPutString(FileName);
@@ -93,5 +93,3 @@ void SerialDownLoad(void)
         SerialPutString(" Warning Receive File failed!!\r\n");
     }
 }
-
-

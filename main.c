@@ -8,9 +8,7 @@
  */
 #include <gd32f4xx.h>
 #include "menu.h"
-#ifndef BOARD_EVAL
 #include "bsp_gpio.h"
-#endif
 #include "bsp_uart.h"
 #include "driverCrc16.h"
 #include "bootLoader.h"
@@ -18,36 +16,43 @@
 
 int main(void)
 {
-    //初始化Core时钟
+    SystemCoreClockUpdate();
+    // 初始化Core时钟
     systick_config();
     InitCRC();
-#ifndef BOARD_EVAL
-    //初始化GPIO并打开V3.3外设供电
+    // 初始化GPIO并打开V3.3外设供电
     InitGpio();
-    PowerOnBmcPeriph();
-    delay_1ms(10);
-#endif
-    //初始化串口
+    int i = 10;
+	  delay_1ms(500);
+    SerialPutString("\r\nThanks for use this bootLoader\r\n");
+    // 初始化串口
     InitSerial();
-	
-	SerialPutString("\r\nThanks for use this bootLoader\r\n");
-
-    if(GetIAPIntper() == 1)
-    //如果获取到IAP请求中断则打印菜单进行IAP操作
+    while (i > 0)
     {
-        Flash_IF_Init();
-        PrintMenu();
+        PowerOnBmcPeriph();
+        char str[64] = {0};
+        sprintf(str, "\r\nWait for ESC key to enter IAP...remain %d s\r\n", i);
+        SerialPutString(str);
+        if (GetIAPIntper() == 1)
+        // 如果获取到IAP请求中断则打印菜单进行IAP操作
+        {
+            Flash_IF_Init();
+            PrintMenu();
+            break;
+        }
+        delay_1ms(500);
+        PowerOffBmcPeriph();
+        delay_1ms(500);
+        i--;
     }
-    //如果无请求则跳转到APP启动
-    else
+    if (i <= 0)
     {
-		SerialPutString("Run App...\r\n");
+        // 如果无请求则跳转到APP启动
+        SerialPutString("Run App...\r\n");
         RunApp();
     }
 
-	while(1)
-	{
-	}	
+    while (1)
+    {
+    }
 }
-
-

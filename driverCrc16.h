@@ -12,10 +12,10 @@
 #include <stdint.h>
 
 #define CRC_WIDTH 16
-#define CRC_PLOY    0x1021
-#define CRC_INIT    0x0000
+#define CRC_PLOY 0x1021
+#define CRC_INIT 0x0000
 
 void InitCRC(void);
-uint16_t CalcuCRC(char* buff, int len);
+uint16_t CalcuCRC(char *buff, int len);
 
-#endif //Driver_CRC16_H
+#endif // Driver_CRC16_H

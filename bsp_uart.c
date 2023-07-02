@@ -10,8 +10,7 @@
 #include "bsp_uart.h"
 
 #include "gd32f4xx_usart.h" // GigaDevice::Device:StdPeripherals:USART
-#include "gd32f4xx_dma.h"               // GigaDevice::Device:StdPeripherals:DMA
-
+#include "gd32f4xx_dma.h"   // GigaDevice::Device:StdPeripherals:DMA
 
 #define IS_AF(c) ((c >= 'A') && (c <= 'F'))
 #define IS_af(c) ((c >= 'a') && (c <= 'f'))
@@ -30,19 +29,21 @@
 void InitSerial(void)
 {
   rcu_periph_clock_enable(USER_RCU_GPIO_TX);
-	rcu_periph_clock_enable(USER_RCU_GPIO_RX);
+  rcu_periph_clock_enable(USER_RCU_GPIO_RX);
   rcu_periph_clock_enable(USER_RCU_UART);
 
   // nvic_irq_enable(UART6_IRQn, 2U,0U);
-
+  gpio_af_set(USER_UART_TX_PORT, USER_UART_GPIO_AF_TX, USER_UART_TX_PIN);
+  gpio_af_set(USER_UART_RX_PORT, USER_UART_GPIO_AF_RX, USER_UART_RX_PIN);
+  
   gpio_mode_set(USER_UART_TX_PORT, GPIO_MODE_AF, GPIO_PUPD_PULLUP, USER_UART_TX_PIN);
   gpio_mode_set(USER_UART_RX_PORT, GPIO_MODE_AF, GPIO_PUPD_PULLUP, USER_UART_RX_PIN);
 
   gpio_output_options_set(USER_UART_TX_PORT, GPIO_OTYPE_PP, GPIO_OSPEED_50MHZ, USER_UART_TX_PIN);
-  gpio_af_set(USER_UART_TX_PORT, USER_UART_GPIO_AF_TX, USER_UART_TX_PIN);
-	gpio_af_set(USER_UART_RX_PORT, USER_UART_GPIO_AF_RX, USER_UART_RX_PIN);
-	
-	  usart_deinit(USER_UART);
+  gpio_output_options_set(USER_UART_TX_PORT, GPIO_OTYPE_PP, GPIO_OSPEED_50MHZ, USER_UART_RX_PIN);
+
+
+  usart_deinit(USER_UART);
 
   usart_baudrate_set(USER_UART, 115200U);
   usart_word_length_set(USER_UART, USART_WL_8BIT);
@@ -52,11 +53,10 @@ void InitSerial(void)
   usart_hardware_flow_rts_config(USER_UART, USART_RTS_DISABLE);
   usart_hardware_flow_cts_config(USER_UART, USART_CTS_DISABLE);
 
-
   usart_receive_config(USER_UART, USART_RECEIVE_ENABLE);
   usart_transmit_config(USER_UART, USART_TRANSMIT_ENABLE);
 
-  // usart_interrupt_enable(USER_UART, USART_INTEN_RBNEIE);
+  //usart_interrupt_enable(USER_UART, USART_INTEN_RBNEIE);
   usart_enable(USER_UART);
 }
 
@@ -64,10 +64,10 @@ void ResetSerial(void)
 {
   usart_deinit(USER_UART);
   gpio_deinit(USER_UART_TX_PORT);
-	gpio_deinit(USER_UART_RX_PORT);
-	dma_deinit(USER_DMA, USER_DMA_CHANNEL);
-	
-	rcu_periph_clock_disable(USER_RCU_DMA);
+  gpio_deinit(USER_UART_RX_PORT);
+  dma_deinit(USER_DMA, USER_DMA_CHANNEL);
+
+  rcu_periph_clock_disable(USER_RCU_DMA);
 }
 
 /**
@@ -78,8 +78,8 @@ void ResetSerial(void)
  */
 uint32_t SerialKeyPressed(uint8_t *key)
 {
-	usart_dma_receive_config(USER_UART, USART_DENR_DISABLE);
-	
+  usart_dma_receive_config(USER_UART, USART_DENR_DISABLE);
+
   if (SET == usart_flag_get(USER_UART, USART_FLAG_RBNE))
   {
     usart_flag_clear(USER_UART, USART_FLAG_RBNE);
@@ -243,38 +243,80 @@ int Str2Int(uint8_t *inputstr, int32_t *intnum)
  */
 void usart_start_receive_block(uint32_t bufferAddress, uint32_t size)
 {
-	dma_single_data_parameter_struct dma_data_paramter;
-	
-	rcu_periph_clock_enable(USER_RCU_DMA);
-	
-	dma_deinit(USER_DMA, USER_DMA_CHANNEL);
-	
-	dma_data_paramter.periph_addr=(uint32_t)(&USART_DATA(USER_UART));
-	dma_data_paramter.periph_inc=DMA_PERIPH_INCREASE_DISABLE;
-	dma_data_paramter.memory0_addr=bufferAddress;
-	dma_data_paramter.memory_inc=DMA_MEMORY_INCREASE_ENABLE;
-	dma_data_paramter.periph_memory_width=DMA_PERIPH_WIDTH_8BIT;
-	dma_data_paramter.direction=DMA_PERIPH_TO_MEMORY;
-	dma_data_paramter.priority=DMA_PRIORITY_HIGH;
-	dma_data_paramter.number=size;
-	dma_data_paramter.circular_mode=DMA_CIRCULAR_MODE_DISABLE;
-	
-	dma_single_data_mode_init(USER_DMA, USER_DMA_CHANNEL, dma_data_paramter);
-	
-	dma_circulation_disable(USER_DMA, USER_DMA_CHANNEL);
-	dma_channel_subperipheral_select(USER_DMA, USER_DMA_CHANNEL, USER_DMA_SUBPERI);
-	
-	dma_channel_enable(USER_DMA, USER_DMA_CHANNEL);
-	
-	usart_dma_receive_config(USER_UART, USART_DENR_ENABLE);
-	/*
-	usart_interrupt_enable(USER_UART, USART_INTEN_IDLEIE);
-	dma_interrupt_enable(USER_DMA, USER_DMA_CHANNEL, DMA_CHXCTL_FTFIE);
-	
-	nvic_irq_enable(USART0_IRQn, 0,0);
-	nvic_irq_enable(USER_DMA_Channel2_IRQn,1,0);
-	*/
+  dma_single_data_parameter_struct dma_data_paramter;
+
+  rcu_periph_clock_enable(USER_RCU_DMA);
+
+  dma_deinit(USER_DMA, USER_DMA_CHANNEL);
+
+  dma_data_paramter.periph_addr = (uint32_t)(&USART_DATA(USER_UART));
+  dma_data_paramter.periph_inc = DMA_PERIPH_INCREASE_DISABLE;
+  dma_data_paramter.memory0_addr = bufferAddress;
+  dma_data_paramter.memory_inc = DMA_MEMORY_INCREASE_ENABLE;
+  dma_data_paramter.periph_memory_width = DMA_PERIPH_WIDTH_8BIT;
+  dma_data_paramter.direction = DMA_PERIPH_TO_MEMORY;
+  dma_data_paramter.priority = DMA_PRIORITY_HIGH;
+  dma_data_paramter.number = size;
+  dma_data_paramter.circular_mode = DMA_CIRCULAR_MODE_DISABLE;
+
+  dma_single_data_mode_init(USER_DMA, USER_DMA_CHANNEL, &dma_data_paramter);
+
+  dma_circulation_disable(USER_DMA, USER_DMA_CHANNEL);
+  dma_channel_subperipheral_select(USER_DMA, USER_DMA_CHANNEL, USER_DMA_SUBPERI);
+
+  dma_channel_enable(USER_DMA, USER_DMA_CHANNEL);
+
+  usart_dma_receive_config(USER_UART, USART_DENR_ENABLE);
+  /*
+  usart_interrupt_enable(USER_UART, USART_INTEN_IDLEIE);
+  dma_interrupt_enable(USER_DMA, USER_DMA_CHANNEL, DMA_CHXCTL_FTFIE);
+
+  nvic_irq_enable(USART0_IRQn, 0,0);
+  nvic_irq_enable(USER_DMA_Channel2_IRQn,1,0);
+  */
 }
+
+
+/**
+ * @description: 启动DMA接收UART RX消息
+ * @param {uint32_t} bufferAddress
+ * @param {uint32_t} size
+ * @return {*}
+ */
+// void usart_start_receive_block(uint32_t bufferAddress, uint32_t size)
+// {
+//   dma_single_data_parameter_struct dma_data_paramter;
+
+//   rcu_periph_clock_enable(RCU_DMA1);
+
+//   dma_deinit(DMA1, DMA_CH2);
+
+//   dma_data_paramter.periph_addr = (uint32_t)(&USART_DATA(USART5));
+//   dma_data_paramter.periph_inc = DMA_PERIPH_INCREASE_DISABLE;
+//   dma_data_paramter.memory0_addr = bufferAddress;
+//   dma_data_paramter.memory_inc = DMA_MEMORY_INCREASE_ENABLE;
+//   dma_data_paramter.periph_memory_width = DMA_PERIPH_WIDTH_8BIT;
+//   dma_data_paramter.direction = DMA_PERIPH_TO_MEMORY;
+//   dma_data_paramter.priority = DMA_PRIORITY_HIGH;
+//   dma_data_paramter.number = size;
+//   dma_data_paramter.circular_mode = DMA_CIRCULAR_MODE_DISABLE;
+
+//   dma_single_data_mode_init(DMA1, DMA_CH2, &dma_data_paramter);
+
+//   dma_circulation_disable(DMA1, DMA_CH2);
+//   dma_channel_subperipheral_select(DMA1, DMA_CH2, DMA_SUBPERI5);
+
+//   dma_channel_enable(DMA1, DMA_CH2);
+
+//   usart_dma_receive_config(USART5, USART_DENR_ENABLE);
+//   /*
+//   usart_interrupt_enable(USER_UART, USART_INTEN_IDLEIE);
+//   dma_interrupt_enable(USER_DMA, USER_DMA_CHANNEL, DMA_CHXCTL_FTFIE);
+
+//   nvic_irq_enable(USART0_IRQn, 0,0);
+//   nvic_irq_enable(USER_DMA_Channel2_IRQn,1,0);
+//   */
+// }
 
 /**
  * @description: 串口 RX是否结束
@@ -282,21 +324,21 @@ void usart_start_receive_block(uint32_t bufferAddress, uint32_t size)
  */
 int GetUsartReceiveFinish(void)
 {
-	int result=0;
-  //在一个帧时间内，RX引脚检测到空闲状态，会将IDLEF置为 1
-	if(usart_flag_get(USER_UART, USART_FLAG_IDLEF) ==SET)
-	{
-    //根据手册
-    //通过读寄存器操作，清除IDLEF位
-		usart_data_receive(USER_UART);
-		result= 1;
-	}
-  //当DMA数据满时，该状态标志有效
-	if(dma_flag_get(USER_DMA, USER_DMA_CHANNEL, DMA_INTF_FTFIF)==SET)
-	{
-    //清除状态标志
-		dma_flag_clear(USER_DMA, USER_DMA_CHANNEL, DMA_INTF_FEEIF);
-		result= 2;
-	}
-	return result;
+  int result = 0;
+  // 在一个帧时间内，RX引脚检测到空闲状态，会将IDLEF置为 1
+  if (usart_flag_get(USER_UART, USART_FLAG_IDLE) == SET)
+  {
+    // 根据手册
+    // 通过读寄存器操作，清除IDLEF位
+    usart_data_receive(USER_UART);
+    result = 1;
+  }
+  // 当DMA数据满时，该状态标志有效
+  if (dma_flag_get(USER_DMA, USER_DMA_CHANNEL, DMA_INTF_FTFIF) == SET)
+  {
+    // 清除状态标志
+    dma_flag_clear(USER_DMA, USER_DMA_CHANNEL, DMA_INTF_FEEIF);
+    result = 2;
+  }
+  return result;
 }
